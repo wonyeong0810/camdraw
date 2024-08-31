@@ -1,5 +1,7 @@
+# ai.py
 import cv2
 import mediapipe as mp
+import numpy as np
 
 class HandTracker:
     def __init__(self, max_num_hands=2, detection_confidence=0.5, tracking_confidence=0.7):
@@ -27,11 +29,45 @@ class HandTracker:
         
         return image, results
 
-    def is_right_hand(self, hand_index, results):
-        if results.multi_handedness:
-            handedness = results.multi_handedness[hand_index].classification[0].label
-            return handedness == 'Right'
-        return False
+    def get_finger_state(self, hand_landmarks):
+        # 손가락 관절 인덱스
+        # 0: 엄지, 1: 검지, 2: 중지, 3: 약지, 4: 새끼손가락
+        FINGER_TIP_IDS = [4, 8, 12, 16, 20]
+        FINGER_PIP_IDS = [3, 7, 11, 15, 19]
+
+        finger_states = [0] * 5
+        
+        for i in range(5):
+            tip = hand_landmarks.landmark[FINGER_TIP_IDS[i]]
+            pip = hand_landmarks.landmark[FINGER_PIP_IDS[i]]
+            
+            # 두 점의 거리 계산
+            distance_tip_pip = np.sqrt(
+                (tip.x - pip.x) ** 2 +
+                (tip.y - pip.y) ** 2 +
+                (tip.z - pip.z) ** 2
+            )
+            
+            # 손가락이 펴져 있는지 판단하는 임계값
+            extended_threshold = 0.043
+            
+            if distance_tip_pip > extended_threshold:
+                finger_states[i] = 1
+
+        return finger_states
+
+    def check_fingers_extended(self, results):
+        finger_states_dict = {}
+        
+        if results.multi_hand_landmarks:
+            for i, hand_landmarks in enumerate(results.multi_hand_landmarks):
+                handedness = results.multi_handedness[i].classification[0].label
+                hand_label = 'Right' if handedness == 'Right' else 'Left'
+                
+                finger_states = self.get_finger_state(hand_landmarks)
+                finger_states_dict[hand_label] = finger_states
+        
+        return finger_states_dict
 
     def release(self):
         self.hands.close()
