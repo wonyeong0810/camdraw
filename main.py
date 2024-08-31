@@ -13,7 +13,6 @@ def main():
         if not ret:
             break
         
-        # 상하 반전
         frame = cv2.flip(frame, 1)  # 0: 상하 반전, 1: 좌우 반전, -1: 상하 및 좌우 반전
         
         image, results = hand_tracker.process_frame(frame)
@@ -21,6 +20,15 @@ def main():
         
         # 손의 랜드마크를 프레임에 그리기
         hand_painter.draw_landmarks(results, frame)
+        
+        # 양손의 모든 손가락이 펴져 있는지 확인
+        all_fingers_extended = all(
+            len(states) == 5 and all(state == 1 for state in states)
+            for states in finger_states.values()
+        )
+        
+        if all_fingers_extended:
+            hand_painter.clear_canvas()
         
         # 검지 손가락이 펴져 있는지 체크하고 그림을 그리기
         hand_painter.draw_on_canvas(results, frame, finger_states)

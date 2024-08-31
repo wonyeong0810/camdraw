@@ -49,6 +49,10 @@ class HandPainter:
                     end_x, end_y = int(end_landmark.x * w), int(end_landmark.y * h)
                     cv2.line(frame, (start_x, start_y), (end_x, end_y), (0, 255, 0), 2)
 
+    def clear_canvas(self):
+        # 캔버스를 지우기 (검은색으로 초기화)
+        self.canvas = np.zeros(self.canvas.shape, dtype=np.uint8)
+    
     def combine_frames(self, frame):
         # 원본 프레임과 캔버스를 결합하여 출력
         return cv2.addWeighted(frame, 0.7, self.canvas, 0.3, 0)
