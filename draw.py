@@ -31,7 +31,7 @@ class HandPainter:
                             self.color = (0, 0, 255)
                         elif finger_states_dict[hand_label] == [1,1,0,0,0]:
                             self.color = (0, 255, 0)
-                        elif finger_states_dict[hand_label] == [1,0,1,0,0]:
+                        elif finger_states_dict[hand_label] == [1,1,1,0,0]:
                             self.color = (255, 0, 0)
                         elif finger_states_dict[hand_label] == [1,0,0,0,1]:
                             self.color = (255, 255, 255)
@@ -75,5 +75,8 @@ class HandPainter:
         frame_fg = cv2.bitwise_and(self.canvas, self.canvas, mask=mask)
         frame_bg = cv2.bitwise_and(frame, frame, mask=mask_inv)
         combined = cv2.add(frame_bg, frame_fg)
+
+        # 현재 색상을 화면에 표시
+        cv2.rectangle(combined, (10, 10), (100, 50), self.color, -1)
 
         return combined
