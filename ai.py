@@ -49,7 +49,7 @@ class HandTracker:
             )
             
             # 손가락이 펴져 있는지 판단하는 임계값
-            extended_threshold = 0.043
+            extended_threshold = 0.040
             
             if distance_tip_pip > extended_threshold:
                 finger_states[i] = 1

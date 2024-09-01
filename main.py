@@ -21,14 +21,15 @@ def main():
         # 손의 랜드마크를 프레임에 그리기
         hand_painter.draw_landmarks(results, frame)
         
-        # 양손의 모든 손가락이 펴져 있는지 확인
-        all_fingers_extended = all(
-            len(states) == 5 and all(state == 1 for state in states)
-            for states in finger_states.values()
+         # 양손의 모든 손가락이 펴져 있는지 확인
+        all_fingers_extended = (
+            len(finger_states) == 2  # 양손 모두 인식된 경우
+            and all(all(state == 1 for state in states) for states in finger_states.values())
         )
         
         if all_fingers_extended:
             hand_painter.clear_canvas()
+            
         
         # 검지 손가락이 펴져 있는지 체크하고 그림을 그리기
         hand_painter.draw_on_canvas(results, frame, finger_states)
