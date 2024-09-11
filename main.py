@@ -6,7 +6,7 @@ import os
 import numpy as np
 
 # FastAPI 서버 주소 설정 (로컬 서버의 IP 주소나 도메인으로 대체)
-SERVER_URL = "http://127.0.0.1:8000/video"
+SERVER_URL = "https://camdraw.onrender.com/video"
 
 def main():
     # 비디오 파일 저장 설정
