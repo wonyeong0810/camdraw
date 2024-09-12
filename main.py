@@ -4,9 +4,11 @@ from ai import HandTracker
 from draw import HandPainter
 import os
 import numpy as np
+import requests
 
 # FastAPI 서버 주소 설정 (로컬 서버의 IP 주소나 도메인으로 대체)
-SERVER_URL = "https://camdraw.onrender.com/video"
+SERVER_UPLOAD_URL = "https://camdraw.onrender.com/upload/"
+SERVER_VIDEO_URL = "https://camdraw.onrender.com/video"
 
 def main():
     # 비디오 파일 저장 설정
@@ -66,8 +68,24 @@ def main():
     hand_tracker.release()
     cv2.destroyAllWindows()
 
+    # 비디오 파일 업로드
+    upload_video(output_path)
+
     # QR 코드 생성 및 표시
     show_qr_code()
+
+def upload_video(file_path):
+    """비디오 파일을 FastAPI 서버에 업로드"""
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as f:
+            files = {'file': (file_path, f, 'video/x-msvideo')}
+            response = requests.post(SERVER_UPLOAD_URL, files=files)
+            if response.status_code == 200:
+                print(f"Video uploaded successfully: {response.json()}")
+            else:
+                print(f"Failed to upload video: {response.status_code}")
+    else:
+        print("Video file not found.")
 
 def show_qr_code():
     # FastAPI 서버의 비디오 URL을 QR 코드로 변환
@@ -79,7 +97,7 @@ def show_qr_code():
     )
     
     # 비디오 파일이 제공될 URL
-    qr.add_data(SERVER_URL)
+    qr.add_data(SERVER_VIDEO_URL)
     qr.make(fit=True)
 
     # QR 코드 이미지를 생성
